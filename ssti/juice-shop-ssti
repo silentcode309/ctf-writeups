@@ -23,9 +23,6 @@ To confirm reflection, I submitted a benign test value:
 
 test123
 
-yaml
-Copy code
-
 The value appeared in the feedback list, confirming that the input was reflected into an Angular template.
 
 ---
@@ -43,9 +40,6 @@ After submitting and scrolling to the feedback list, the application displayed:
 
 49
 
-yaml
-Copy code
-
 This confirmed that Angular evaluated the expression instead of treating it as plain text, indicating a CSTI vulnerability.
 
 ---
@@ -58,9 +52,6 @@ Examples:
 {{3+4}}
 {{'hi'+'there'}}
 {{(true&&false)}}
-
-yaml
-Copy code
 
 Each payload rendered its evaluated result, confirming the vulnerability allowed arbitrary Angular expression execution inside the DOM.
 
