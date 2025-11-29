@@ -23,9 +23,6 @@ To test access control, the endpoint was requested directly:
 
 http://localhost:3000/api/hints
 
-pgsql
-Copy code
-
 This was done **without being logged in as an admin** and **without solving any challenges**.
 
 ---
