@@ -15,9 +15,91 @@ This exposure can lead to arbitrary JavaScript execution and full DOM access if 
 ## Recon
 During initial exploration, the **Customer Feedback** page stood out because:
 
-- It accepts user-submitted comments.
-- It immediately renders those comments back into the page.
+- It accepts user-submitted comments.  
+- It immediately renders those comments back into the page.  
 - The rendering uses Angular binding, which is known to allow `{{ }}` expressions if unsanitized.
 
 To confirm reflection, I submitted a benign test value:
 
+test123
+
+yaml
+Copy code
+
+The value appeared in the feedback list, confirming that the input was reflected into an Angular template.
+
+---
+
+## Vulnerability Discovery
+Next, I tested whether the frontend evaluated Angular expressions.  
+I submitted this payload in the **Comment** field:
+
+{{7*7}}
+
+css
+Copy code
+
+After submitting and scrolling to the feedback list, the application displayed:
+
+49
+
+yaml
+Copy code
+
+This confirmed that Angular evaluated the expression instead of treating it as plain text, indicating a CSTI vulnerability.
+
+---
+
+## Exploitation
+Once expression evaluation was confirmed, I attempted additional safe payloads to understand the level of access.
+
+Examples:
+
+{{3+4}}
+{{'hi'+'there'}}
+{{(true&&false)}}
+
+yaml
+Copy code
+
+Each payload rendered its evaluated result, confirming the vulnerability allowed arbitrary Angular expression execution inside the DOM.
+
+Note:  
+All testing was performed in a controlled environment.  
+Potentially harmful payloads (such as JS execution via constructor calls) were intentionally not used.
+
+---
+
+## Root Cause
+The feedback system binds user-controlled input directly into an Angular template without applying sanitization or escaping.  
+Angular interprets data inside `{{ }}` as expressions, so untrusted input becomes executable code within the client template engine.
+
+---
+
+## Impact
+If chained with other weaknesses, this vulnerability may allow:
+
+- Arbitrary JavaScript execution  
+- DOM manipulation  
+- Data exfiltration from the page  
+- Session hijacking (XSS-like impact)  
+- Pivoting through additional flaws (e.g., CSRF token theft)
+
+Although CSTI occurs on the client side, its impact can be similar to stored XSS when combined with JavaScript execution.
+
+---
+
+## Mitigation
+To prevent CSTI in Angular-based applications:
+
+- Sanitize user input before binding.  
+- Avoid unescaped bindings for user-generated text.  
+- Use Angular’s built-in sanitization services.  
+- Treat all user-supplied fields as untrusted and escape appropriately.
+
+---
+
+## Tools
+- Browser Developer Tools  
+- Burp Suite Community Edition  
+- Juice Shop (local Docker instance)
