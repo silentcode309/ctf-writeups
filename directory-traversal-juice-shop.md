@@ -13,15 +13,9 @@ Initial exploration identified a public file browser located at:
 
 /ftp
 
-css
-Copy code
-
 The page loads files dynamically using a parameter, typically in the form:
 
 /ftp?file=<filename>
-
-markdown
-Copy code
 
 This hinted at potential file‑path manipulation.
 
@@ -36,16 +30,10 @@ A crafted payload successfully escaped the intended directory:
 
 /ftp?file=../../../../../../etc/passwd
 
-sql
-Copy code
-
 The server returned the full contents of `/etc/passwd`, confirming directory traversal. Additional tests with other system files also succeeded:
 
 /ftp?file=../../../../../../../etc/hostname
 /ftp?file=../../../../../../../proc/self/environ
-
-markdown
-Copy code
 
 Each returned evaluated file contents, demonstrating unrestricted file read capability.
 
