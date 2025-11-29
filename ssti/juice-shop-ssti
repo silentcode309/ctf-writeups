@@ -2,7 +2,7 @@
 Category: Template Injection (CSTI)  
 Difficulty: Easy  
 Platform: OWASP Juice Shop  
-Date: 2025-__
+Date: 11-2025
 
 ## Summary
 This challenge demonstrates a Client-Side Template Injection (CSTI) vulnerability in the **Customer Feedback** feature of OWASP Juice Shop.  
