@@ -1,54 +1,23 @@
-# SSTI Challenge – Juice Shop
-
-Category: SSTI  
+# Juice Shop – SSTI (Angular Expression Injection)
+Category: Template Injection (CSTI)  
 Difficulty: Easy  
 Platform: OWASP Juice Shop  
 Date: 2025-__
 
 ## Summary
-This challenge demonstrates Server-Side Template Injection (SSTI) in the product review functionality of Juice Shop. The application renders user-supplied input inside a template engine without proper sanitization, allowing attacker-controlled expressions to execute on the server.
+This challenge demonstrates a Client-Side Template Injection (CSTI) vulnerability in the **Customer Feedback** feature of OWASP Juice Shop.  
+The application passes user-controlled input into Angular’s templating engine without sanitization, allowing expressions inside `{{ }}` to be evaluated in the browser context.
+
+This exposure can lead to arbitrary JavaScript execution and full DOM access if chained with other flaws.
+
+---
 
 ## Recon
-During initial page exploration, the product review form allowed the user to submit text that was later rendered by the server. The input was reflected within a template-based context.
+During initial exploration, the **Customer Feedback** page stood out because:
 
-Initial tests:
-- Submitting regular text to confirm reflection.
-- Attempting common template payload markers such as `{{7*7}}`, `${7*7}`, and `<%= 7*7 %>`.
+- It accepts user-submitted comments.
+- It immediately renders those comments back into the page.
+- The rendering uses Angular binding, which is known to allow `{{ }}` expressions if unsanitized.
 
-The payload `{{7*7}}` was rendered as `49`, confirming SSTI.
+To confirm reflection, I submitted a benign test value:
 
-## Vulnerability Discovery
-Juice Shop uses a template engine that interprets double-curly-brace expressions.  
-Because the user-provided review text was injected directly into the template without filtering, the expression executed on the server side.
-
-Key indicator:
-- Input: `{{7*7}}`
-- Output: `49` (evaluated)
-
-This confirmed the presence of SSTI.
-
-## Exploitation
-Once expression evaluation was confirmed, additional safe test payloads were attempted to determine depth of access.
-
-Examples of safe tests:
-- `{{ "test".upper() }}`
-- `{{ 5 + 10 }}`
-
-These produced expected evaluated output, confirming deeper template access.
-
-(Real system compromise steps are intentionally excluded and flags are redacted.)
-
-## Root Cause
-The review system concatenated untrusted user input directly into a server-side template.  
-Lack of input sanitization or context escaping allowed evaluation of attacker-controlled expressions.
-
-## Mitigation
-- Apply proper escaping for all template variables.
-- Disable expression evaluation for user-controlled fields.
-- Implement allowlists for text-based inputs.
-- Use a secure template engine configuration that does not allow arbitrary expression execution.
-
-## Tools
-- Browser developer tools
-- Burp Suite Community Edition
-- Juice Shop (local instance)
