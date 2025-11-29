@@ -1,0 +1,58 @@
+# Broken Access Control – Unauthorized Access to Internal Hints API
+
+**Category:** Broken Access Control / IDOR  
+**Difficulty:** Easy–Medium  
+**Platform:** OWASP Juice Shop  
+**Date:** 2025-__
+
+---
+
+## Summary
+
+This challenge demonstrates a **Broken Access Control** vulnerability via an **Insecure Direct Object Reference (IDOR)** in Juice Shop’s internal `/api/hints` endpoint.  
+The server exposes privileged challenge hint data to unauthenticated users when accessed directly, bypassing all intended authorization checks.
+
+---
+
+## Recon
+
+While inspecting network activity on the Score Board page, the `/api/hints` endpoint appeared under XHR requests.  
+This endpoint is normally intended to deliver challenge hints only when specific UI conditions are met.
+
+To test access control, the endpoint was requested directly:
+
+http://localhost:3000/api/hints
+
+pgsql
+Copy code
+
+This was done **without being logged in as an admin** and **without solving any challenges**.
+
+---
+
+## Vulnerability Discovery
+
+Direct access returned the full structured JSON hint dataset, formatted across multiple lines.  
+This confirms that the server performs no privilege checks before returning sensitive metadata.
+
+### Example response (truncated):
+
+```json
+[
+  {
+    "id": 1,
+    "challenge": "Login Admin",
+    "hint": "Try inspecting the login POST request..."
+  },
+  {
+    "id": 2,
+    "challenge": "Score Board",
+    "hint": "Look at how the API is being called..."
+  },
+  {
+    "id": 3,
+    "challenge": "Forged Review",
+    "hint": "Maybe the review author field isn’t validated."
+  }
+]
+This data was returned directly without requiring any authentication cookies or tokens.
