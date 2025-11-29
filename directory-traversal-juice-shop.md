@@ -3,7 +3,7 @@
 Category: Directory Traversal  
 Difficulty: Easy  
 Platform: OWASP Juice Shop  
-Date: 02-2025
+Date: 11-2025
 
 ## Summary
 This challenge demonstrates a directory traversal vulnerability in the file-serving functionality of OWASP Juice Shop. The application exposes an endpoint that allows users to request files by name, but it fails to properly sanitize the file path. As a result, attackers can use `../` sequences to escape the intended directory and read arbitrary files on the server.
